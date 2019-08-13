@@ -180,11 +180,28 @@ if(check_AT_ok("AT\r\n", "OK",1000))
 		//出错
 		  AT_error++;
 		}
-		if(!check_AT_ok("AT+CIPSTART=\"TCP\",\"183.230.40.39\",\"6002\"\r\n", "CONNECT",10000))//如果连接成功
-		{
-				//组装连接OneNet包
-				if(MQTT_PacketConnect("267582", "sFov2oSSbvwoP2QrE1nnCp3I0Po=", "540067462", 256, 0, MQTT_QOS_LEVEL0, NULL, NULL, 0, &mqttPacket) == 0)
+		if(check_AT_ok("AT+CIPSTART=\"TCP\",\"183.230.40.39\",\"6002\"\r\n", "CONNECT",10000))//如果连接成功
+		     {
+					 //如果出错
+									if(check_AT_ok("AT+CIPCLOSE\r\n", "OK",2000))
+								{
+								//出错
+									AT_error++;
+
+								}
+								if(check_AT_ok("AT+CIPSHUT\r\n", "OK",8000))
+								{
+								//出错
+									AT_error++;
+
+								}
+		     }	
+				else
 				{
+					//如果没错误,继续发送
+									//组装连接OneNet包
+			  	if(MQTT_PacketConnect("267582", "sFov2oSSbvwoP2QrE1nnCp3I0Po=", "540067462", 256, 0, MQTT_QOS_LEVEL0, NULL, NULL, 0, &mqttPacket) == 0)
+				  {
 				//---------------------------------------------步骤二：发送数据-----------------------------------------
 						NET_DEVICE_SendData(mqttPacket._data, mqttPacket._len);
 						MQTT_DeleteBuffer(&mqttPacket);									//删包  
@@ -192,27 +209,15 @@ if(check_AT_ok("AT\r\n", "OK",1000))
 								{
 								delay_ms(1);
 								}
+			 //组装数据包	
 					  OneNet_SendData(FORMAT_TYPE3, NULL, NULL, dataStream, dataStreamCnt);		
 							 for(i=0;i<8000;i++)
 								{
 								delay_ms(1);
 								}
+				  }
 				}	
-			  //组装数据包
-				
-		}	
-			if(check_AT_ok("AT+CIPCLOSE\r\n", "OK",2000))
-		{
-		//出错
-		  AT_error++;
 
-		}
-		if(check_AT_ok("AT+CIPSHUT\r\n", "OK",8000))
-		{
-		//出错
-		  AT_error++;
-
-		}
 
 	}
 return 0;
