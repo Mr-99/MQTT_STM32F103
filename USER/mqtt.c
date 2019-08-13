@@ -201,13 +201,13 @@ if(check_AT_ok("AT\r\n", "OK",1000))
 			  //组装数据包
 				
 		}	
-			if(check_AT_ok("AT+CIPCLOSE\r\n", "OK",1000))
+			if(check_AT_ok("AT+CIPCLOSE\r\n", "OK",2000))
 		{
 		//出错
 		  AT_error++;
 
 		}
-		if(check_AT_ok("AT+CIPSHUT\r\n", "OK",1000))
+		if(check_AT_ok("AT+CIPSHUT\r\n", "OK",8000))
 		{
 		//出错
 		  AT_error++;
