@@ -162,6 +162,7 @@ if(check_AT_ok("AT\r\n", "OK",1000))
 		if(check_AT_ok("AT+CREG?\r\n", "+CREG: 0,1",1000))
 		{
       net_state = 0;
+			return 0;
 		}	
 		else
 		{
@@ -169,12 +170,16 @@ if(check_AT_ok("AT\r\n", "OK",1000))
 		}
 	if(1==net_state)
 	{
-		if(check_AT_ok("AT+CIICR\r\n", "OK",1000))
+		if(check_AT_ok("AT+CDNSORIP=0\r\n", "OK",1000))
 		{
 		//出错
 		  AT_error++;
 		}
-
+		if(check_AT_ok("AT+CIPHEAD=1\r\n", "OK",1000))
+		{
+		//出错
+		  AT_error++;
+		}
 		if(!check_AT_ok("AT+CIPSTART=\"TCP\",\"183.230.40.39\",\"6002\"\r\n", "CONNECT",10000))//如果连接成功
 		{
 				//组装连接OneNet包
@@ -196,25 +201,13 @@ if(check_AT_ok("AT\r\n", "OK",1000))
 			  //组装数据包
 				
 		}	
-			if(check_AT_ok("AT+CGATT=1\r\n", "OK",1000))
+			if(check_AT_ok("AT+CIPCLOSE\r\n", "OK",1000))
 		{
 		//出错
 		  AT_error++;
 
 		}
-		if(check_AT_ok("AT+CGACT=1\r\n", "OK",1000))
-		{
-		//出错
-		  AT_error++;
-
-		}
-				if(check_AT_ok("AT+CIPSHUT\r\n", "SHUT OK",1000))
-		{
-		//出错
-		  AT_error++;
-
-		}
-					if(check_AT_ok("AT+CIICR\r\n", "OK",1000))
+		if(check_AT_ok("AT+CIPSHUT\r\n", "OK",1000))
 		{
 		//出错
 		  AT_error++;
