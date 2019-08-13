@@ -1,0 +1,40 @@
+.\objects\gprs.o: ..\HARDWARE\GPRS\gprs.c
+.\objects\gprs.o: ..\HARDWARE\GPRS\gprs.h
+.\objects\gprs.o: D:\Program FilesKeil_v5\ARM\ARMCC\Bin\..\include\string.h
+.\objects\gprs.o: ..\SYSTEM\delay\delay.h
+.\objects\gprs.o: ..\SYSTEM\sys\sys.h
+.\objects\gprs.o: ..\USER\stm32f10x.h
+.\objects\gprs.o: ..\CORE\core_cm3.h
+.\objects\gprs.o: D:\Program FilesKeil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\objects\gprs.o: ..\USER\system_stm32f10x.h
+.\objects\gprs.o: ..\USER\stm32f10x_conf.h
+.\objects\gprs.o: ..\STM32F10x_FWLib\inc\stm32f10x_adc.h
+.\objects\gprs.o: ..\USER\stm32f10x.h
+.\objects\gprs.o: ..\STM32F10x_FWLib\inc\stm32f10x_bkp.h
+.\objects\gprs.o: ..\STM32F10x_FWLib\inc\stm32f10x_can.h
+.\objects\gprs.o: ..\STM32F10x_FWLib\inc\stm32f10x_cec.h
+.\objects\gprs.o: ..\STM32F10x_FWLib\inc\stm32f10x_crc.h
+.\objects\gprs.o: ..\STM32F10x_FWLib\inc\stm32f10x_dac.h
+.\objects\gprs.o: ..\STM32F10x_FWLib\inc\stm32f10x_dbgmcu.h
+.\objects\gprs.o: ..\STM32F10x_FWLib\inc\stm32f10x_dma.h
+.\objects\gprs.o: ..\STM32F10x_FWLib\inc\stm32f10x_exti.h
+.\objects\gprs.o: ..\STM32F10x_FWLib\inc\stm32f10x_flash.h
+.\objects\gprs.o: ..\STM32F10x_FWLib\inc\stm32f10x_fsmc.h
+.\objects\gprs.o: ..\STM32F10x_FWLib\inc\stm32f10x_gpio.h
+.\objects\gprs.o: ..\STM32F10x_FWLib\inc\stm32f10x_i2c.h
+.\objects\gprs.o: ..\STM32F10x_FWLib\inc\stm32f10x_iwdg.h
+.\objects\gprs.o: ..\STM32F10x_FWLib\inc\stm32f10x_pwr.h
+.\objects\gprs.o: ..\STM32F10x_FWLib\inc\stm32f10x_rcc.h
+.\objects\gprs.o: ..\STM32F10x_FWLib\inc\stm32f10x_rtc.h
+.\objects\gprs.o: ..\STM32F10x_FWLib\inc\stm32f10x_sdio.h
+.\objects\gprs.o: ..\STM32F10x_FWLib\inc\stm32f10x_spi.h
+.\objects\gprs.o: ..\STM32F10x_FWLib\inc\stm32f10x_tim.h
+.\objects\gprs.o: ..\STM32F10x_FWLib\inc\stm32f10x_usart.h
+.\objects\gprs.o: ..\STM32F10x_FWLib\inc\stm32f10x_wwdg.h
+.\objects\gprs.o: ..\STM32F10x_FWLib\inc\misc.h
+.\objects\gprs.o: ..\SYSTEM\usart\usart.h
+.\objects\gprs.o: D:\Program FilesKeil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+.\objects\gprs.o: ..\HARDWARE\GPIO\gpio.h
+.\objects\gprs.o: ..\HARDWARE\TIMER\timer.h
+.\objects\gprs.o: ..\HARDWARE\24CXX\24cxx.h
+.\objects\gprs.o: ..\HARDWARE\IIC\myiic.h
