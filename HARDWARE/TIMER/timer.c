@@ -25,7 +25,10 @@ u8	ch1En = 0;
 //u16	hh = 0;		//小时计时
 u8	time2slice = 19;
 u8	OpenTime = 0;
-
+//修改如下
+//新增一个变量，在mqtt.c中引用
+uint16_t at_count = 0;
+//END
 
 void TIM3_Int_Init(u16 arr,u16 psc)
 {
@@ -160,6 +163,12 @@ void TIM2_IRQHandler(void)
 {
 	if(TIM_GetFlagStatus(TIM2,TIM_FLAG_Update))
 	{
+		//增加如下
+	  if(at_count>0)
+		{
+		   at_count--;
+		}
+		//END
 		ADC_en = 1;
 		if(time2slice != 0)
 		{

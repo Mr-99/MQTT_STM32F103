@@ -785,7 +785,7 @@ int main(void)
 //	USART1_SendString(RecordDat,16);
 
 /*----------------------------------------*/
-//向九洲修改如下
+//修改如下
 gpio_init();//初始化gpio
 	for(i = 0;i<10000;i++)
 	{
@@ -794,7 +794,9 @@ gpio_init();//初始化gpio
 //END
 	while(1)
 	{
-		tcp_ip_connect();
+		//修改如下，连接onenet
+		no_wait_connect();
+		//tcp_ip_connect();
 //	if(tcp_ip_connect())
 //	{		
 //	onenet_send_data();
