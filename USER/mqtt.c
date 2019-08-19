@@ -184,7 +184,7 @@ void gpio_init(void)
  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9;
  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP; 		 //推挽输出
  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;		 //IO口速度为50MHz
- GPIO_Init(GPIOA, &GPIO_InitStructure);					 //根据设定参数初始化GPIOA
+ GPIO_Init(GPIOC, &GPIO_InitStructure);					 //根据设定参数初始化GPIOA
  GPIO_SetBits(GPIOC,GPIO_Pin_9);	
 		//PA12组配置
  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12;
@@ -196,7 +196,7 @@ void gpio_init(void)
  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP; 		 //推挽输出
  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;		 //IO口速度为50MHz
- GPIO_Init(GPIOA, &GPIO_InitStructure);					 //根据设定参数初始化GPIOA
+ GPIO_Init(GPIOD, &GPIO_InitStructure);					 //根据设定参数初始化GPIOA
  GPIO_SetBits(GPIOD,GPIO_Pin_3);	
 }
 //switch方法进行连接

@@ -787,6 +787,10 @@ int main(void)
 /*----------------------------------------*/
 //修改如下
 gpio_init();//初始化gpio
+//	EN_12V = 1;
+//	EN_GPRS= 1;
+//	START= 1;
+//	EN_GPS= 1;
 	for(i = 0;i<10000;i++)
 	{
 	delay_ms(1);
