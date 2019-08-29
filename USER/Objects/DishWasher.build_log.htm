@@ -3,8 +3,8 @@
 <pre>
 <h1>礦ision Build Log</h1>
 <h2>Tool Versions:</h2>
-IDE-Version: μVision V5.25.3.0
-Copyright (C) 2018 ARM Ltd and ARM Germany GmbH. All rights reserved.
+IDE-Version: μVision V5.14.0.0
+Copyright (C) 2015 ARM Ltd and ARM Germany GmbH. All rights reserved.
 License Information: jia 89298, jia, LIC=CRMNN-YEFAP-LUR4M-X1X2X-U9XM8-LTGF0
  
 Tool Versions:
@@ -22,26 +22,25 @@ Dialog DLL:      TCM.DLL V1.14.4.0
  
 <h2>Project:</h2>
 F:\desk\Work\胡桃项目\C\MasterControl\MasterControl\USER\MasterControl.uvprojx
-Project File Date:  08/12/2019
+Project File Date:  08/27/2019
 
 <h2>Output:</h2>
-*** Using Compiler 'V5.05 update 1 (build 106)', folder: 'D:\Program FilesKeil_v5\ARM\ARMCC\Bin'
 Build target 'DishWasher'
-".\Objects\DishWasher.axf" - 0 Error(s), 0 Warning(s).
-
-<h2>Software Packages used:</h2>
-
-Package Vendor: Keil
-                http://www.keil.com/pack/Keil.STM32F1xx_DFP.1.0.5.pack
-                Keil.STM32F1xx_DFP.1.0.5
-                STMicroelectronics STM32F1 Series Device Support, Drivers and Examples
+compiling mqtt.c...
+mqtt.c(218): warning:  #177-D: variable "prt" was declared but never referenced
+  volatile unsigned char *prt=0;
+mqtt.c(768): warning:  #1-D: last line of file ends without a newline
+  }
+mqtt.c: 2 warnings, 0 errors
+linking...
+Program Size: Code=32816 RO-data=548 RW-data=464 ZI-data=4536  
+".\Objects\DishWasher.axf" - 0 Error(s), 2 Warning(s).
 
 <h2>Collection of Component include folders:</h2>
-  .\RTE\_DishWasher
+  F:\desk\Work\胡桃项目\C\MasterControl\MasterControl\USER\RTE
   D:\Program FilesKeil_v5\ARM\PACK\Keil\STM32F1xx_DFP\1.0.5\Device\Include
 
 <h2>Collection of Component Files used:</h2>
-Build Time Elapsed:  00:00:00
 </pre>
 </body>
 </html>

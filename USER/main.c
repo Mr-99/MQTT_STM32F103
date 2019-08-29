@@ -39,8 +39,8 @@ void System_Init()
 	
 	USART2_Init(115200);
 	USART3_Init(115200);
-	UART4_Init(9600);
-	UART5_Init(9600);
+	UART4_Init(115200);
+	UART5_Init(115200);
 }
 
 void ParaLoad(void)

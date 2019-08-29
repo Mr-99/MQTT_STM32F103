@@ -3,6 +3,9 @@
 #include "malloc.h"
 #include "string.h"
 #include "gpio.h"
+//修改如下
+gps_original gps1;
+//
 //#include "timer.h"
 //#include "led.h"
 ////////////////////////////////////////////////////////////////////////////////// 	 
@@ -90,9 +93,9 @@ u8 USART3_TX_P=0;
 u8 USART3_TX_NUM=0;
 u8 USART3_BUSY=0;
 
-u8 UART4_RX_BUF[16];
+u8 UART4_RX_BUF[500];
 u8 UART4_RX_DEAL[16];
-u8 UART4_RX_P=0;
+u32 UART4_RX_P=0;
 u8 UART4_RXED=0;
 u8 UART4_TX_BUF[16];
 u8 UART4_TX_P=0;
@@ -138,7 +141,7 @@ void uart_init(u32 bound){
   //Usart1 NVIC 配置
   NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=3 ;//抢占优先级3
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 3;		//子优先级3
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 2;		//子优先级3
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;			//IRQ通道使能
 	NVIC_Init(&NVIC_InitStructure);	//根据指定的参数初始化VIC寄存器
   
@@ -238,8 +241,8 @@ void USART3_Init(u32 bound)
 
   //Usart3 NVIC 配置
   NVIC_InitStruct.NVIC_IRQChannel = USART3_IRQn;
-  NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority= 4;
-  NVIC_InitStruct.NVIC_IRQChannelSubPriority = 4;		
+  NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority= 3;
+  NVIC_InitStruct.NVIC_IRQChannelSubPriority = 3;		
   NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;			//IRQ通道使能
   NVIC_Init(&NVIC_InitStruct);	//根据NVIC_InitStruct中指定的参数初始化外设NVIC寄存器USART2
   
@@ -288,8 +291,8 @@ void UART4_Init(u32 bound)
 
   //Usart4 NVIC 配置
   NVIC_InitStruct.NVIC_IRQChannel = UART4_IRQn;
-  NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority= 4;
-  NVIC_InitStruct.NVIC_IRQChannelSubPriority = 3;		
+  NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority= 3;
+  NVIC_InitStruct.NVIC_IRQChannelSubPriority = 2;		
   NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;			//IRQ通道使能
   NVIC_Init(&NVIC_InitStruct);	//根据NVIC_InitStruct中指定的参数初始化外设NVIC寄存器USART2
   
@@ -304,7 +307,7 @@ void UART4_Init(u32 bound)
 
   //USART_ITConfig(USART3,USART_IT_RXNE,ENABLE);
 	USART_ITConfig(UART4, USART_IT_RXNE , ENABLE);//开启串口接受中断
-	USART_ITConfig(UART4, USART_IT_TC , ENABLE);//开启串口接受中断
+//	USART_ITConfig(UART4, USART_IT_TC , ENABLE);//开启串口接受中断
   USART_Cmd(UART4, ENABLE);//使能串口4
 //  USART_ClearITPendingBit(USART3,USART_IT_TXE);//清除中断标志
 }
@@ -338,8 +341,8 @@ void UART5_Init(u32 bound)
 
   //Usart5 NVIC 配置
   NVIC_InitStruct.NVIC_IRQChannel = UART5_IRQn;
-  NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority= 2;
-  NVIC_InitStruct.NVIC_IRQChannelSubPriority = 2;		
+  NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority= 3;
+  NVIC_InitStruct.NVIC_IRQChannelSubPriority = 3;		
   NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;			//IRQ通道使能
   NVIC_Init(&NVIC_InitStruct);	//根据NVIC_InitStruct中指定的参数初始化外设NVIC寄存器USART2
   
@@ -540,41 +543,60 @@ void UART5_IRQHandler(void)                	//串口5中断服务程序
 void UART4_IRQHandler(void)                	//串口5中断服务程序
 {
 	u8 Res4;
-	
+const	unsigned char gps_header[] = {"$GNRMC"};
+static const unsigned char * cmp_p = (unsigned char *)0;
+static u8 re_falg = 0,frist = 0;
+u8 i = 0,j=0;
+	if(!frist)
+	{
+	frist = 1;
+	cmp_p = (unsigned char *)&gps_header[0];
+	}
 	if(USART_GetITStatus(UART4, USART_IT_RXNE) != RESET)  //接收中断(接收到的数据必须是0x0d 0x0a结尾)
 	{
 		USART_ClearITPendingBit(UART4,USART_IT_RXNE);
 		Res4 =USART_ReceiveData(UART4);					//读取接收到的数据
-		if(0x0A == Res4)
+    if(Res4 == *cmp_p)//开始匹配头部
 		{
-			UART4_RXED = 1;
-			memcpy(UART4_RX_DEAL,UART4_RX_BUF,UART4_RX_P);
-			UART4_RX_P = 0;
+		cmp_p++;
+						if(0==*cmp_p)//匹配正确
+						{
+						cmp_p = (unsigned char *)&gps_header[0];
+						re_falg = 1;
+						}
 		}
 		else
+		{
+		cmp_p = (unsigned char *)&gps_header[0];
+		}
+		if(re_falg)//开始接受
 		{
 			UART4_RX_BUF[UART4_RX_P] = Res4;
 			UART4_RX_P++;
-			if(UART4_RX_P >= 32)
+			if(Res4==0x0A)//接受完毕
+			{
+			UART4_RX_P = 0;
+			re_falg = 0;
+				//如果卫星数据有效
+				if(UART4_RX_BUF[13] == 'A')
+				{
+				for(i=15;UART4_RX_BUF[i]!=',';i++)
+					  {
+						gps1.N[i-15] = UART4_RX_BUF[i];
+						}
+					 gps1.N[i-15] = '\0';
+				for(j=i+3;UART4_RX_BUF[j]!=',';j++)
+					  {
+					gps1.E[j-i-3] = UART4_RX_BUF[j];
+						}
+					gps1.E[j-i-3] = '\0';
+				}
+			}
+			if(UART4_RX_P >= 500)
 			UART4_RX_P = 0;
 		}
-  } 
-	
-	if(USART_GetITStatus(UART4, USART_IT_TC))
-	{
-		if(UART4_TX_NUM != 0)
-		{
-			UART4_TX_P++;
-			UART4_TX_NUM--;
-			USART_SendData(UART4, UART4_TX_BUF[UART4_TX_P]);
-		}
-		else
-		{
-			UART4_BUSY = 0;
-		}	
-		USART_ClearITPendingBit(UART4,USART_IT_TC);
-	}
-	
+
+  } 	
 }
 
 void UART4_SendBytes(u8 *s,u8 len)

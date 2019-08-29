@@ -7,6 +7,10 @@
 #include "dStream.h"
 #include<string.h>
 #include<stdio.h>
+//数据处理包含的头文件
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 //定义at出错跳转
 #define error (34)
 //引用的外部变量
@@ -16,6 +20,12 @@ uint8_t AT_error = 0;
 //需要发送的数据流
 uint8_t Led1 = 21,Led2 = 22;
 #define RX5_BUFF_LENG 200 
+//外部变量声明
+extern struct _gps_original gps1;
+//END
+//GPS相关
+float lon;
+float lat;
 typedef struct
 {
 
@@ -26,8 +36,9 @@ typedef struct
 
 } GPS_INFO;
 //END
+typedef unsigned char Flag_Type;
 extern u16	Para[32];
-GPS_INFO gps = {"0","0",1};
+GPS_INFO gps = {"116.28669146096","39.834073314787",1};
 unsigned char imie[30] = "20190727S902BD0001";
 unsigned char date[30] = "2019.03.08";
 unsigned char device_id[30] = "BSA-S902BD";
@@ -104,9 +115,9 @@ while(1)
 }	
 }
 //@只发送数据函数
-void NET_DEVICE_SendData(unsigned char *data, unsigned short len)
+void NET_DEVICE_SendData(unsigned char *data, unsigned int len)
 {
-	uint8_t i = 0;
+	unsigned int i = 0;
 	uint8_t *p = data;
  for(i=0;i<3;i++)
 	{
@@ -135,13 +146,12 @@ else
 continue;
 }
 	}
-
 	}
 
 	//@无等待发送数据函数
-void no_wait_NET_DEVICE_SendData(unsigned char *data, unsigned short len)
+void no_wait_NET_DEVICE_SendData(unsigned char *data, unsigned int len)
 {
-	uint8_t i = 0;
+	unsigned int i = 0;
 	uint8_t *p = data;
 									for(i =0;i<len;i++)
 								{
@@ -205,7 +215,9 @@ void no_wait_connect(void)
 MQTT_PACKET_STRUCTURE mqttPacket = {NULL, 0, 0, 0};
 static uint8_t state = 0;
 unsigned char i=0;
-volatile unsigned char *prt;
+volatile unsigned char *prt=0;
+static Flag_Type frist_send = 0;
+u32 lon_inter = 0,lat_inter = 0,j=0;
 Led1++;
 switch (state)
 {
@@ -380,26 +392,78 @@ fill_at_count(&at_count,40);//延时2s
 		break;
 //获取GPS
 	 case 19:
+ if(!frist_send)
+ {
+	 frist_send = 1;
 uart5_send_string("AT+CGPSPWR=1\r\n");
+	  delay_ms(5);
+uart5_send_string("AT+CGNSTST=1\r\n");
+	  delay_ms(5);
+uart5_send_string("AT+CGNSIPR=115200\r\n");
+	  delay_ms(5);
+uart5_send_string("AT+CGNSTST=0\r\n");
+	  delay_ms(5);
+uart5_send_string("AT+CGNSURC=1\r\n"); 
+	  delay_ms(5);
 fill_at_count(&at_count,40);//延时2s
+ }
 	  state = 20;
 		break;
 	 case 20: 
-		if(check_at_count(&at_count))
-{
-		if(strstr((const char*)UART5_RX_BUF, (const char*)"OK"))
-		{
-				state = 21;//如果匹配成功,切换到状态2
-		}
-		else
-		{
-			  state = 0;
-		}
-}
-		break;
-//获取GPS
+		 state = 21;
+//		if(check_at_count(&at_count))
+//{
+//		if(strstr((const char*)UART5_RX_BUF, (const char*)"OK"))
+//		{
+//				state = 21;//如果匹配成功,切换到状态2
+//		}
+//		else
+//		{
+//			  state = 0;
+//		}
+//}
+//数据处理 转换mmm到ddd
 	 case 21:
-uart5_send_string("AT+CGPSINF=0\r\n");
+		 		for( i = 0;i<16;i++)
+				{
+				gps.lon[i] = 0;
+				gps.lat[i] = 0;
+				}  
+		   for( i = 0;i<16;i++)
+				{
+				gps.lon[i] = gps1.E[i];
+				gps.lat[i] = gps1.N[i];
+				}  
+				for( i = 0;i<16;i++)
+				{
+          if('.'==gps.lon[i])
+					{
+					lon = atof(&gps.lon[i]-2); 
+					lon = lon/60;
+					for(j = 0;j<i-2;j++)
+						{
+			   lon_inter = lon_inter*10+(gps.lon[j]-0x30);
+						}
+						lon = lon_inter+lon;
+					sprintf(gps.lon, "%f", lon); //产生"3.141593"
+					}
+          if('.'==gps.lat[i])
+					{
+					lat = atof(&gps.lat[i]-2); 
+					lat = lat/60;
+					for(j = 0;j<i-2;j++)//取出dd
+						{
+			   lat_inter = lat_inter*10+(gps.lat[j]-0x30);
+						}
+						lat = lat_inter+lat;
+					sprintf(gps.lat, "%f", lat); //产生"3.141593"
+					}
+				}
+      
+
+  
+      
+uart5_send_string("AT\r\n");
 fill_at_count(&at_count,40);//延时2s
 	  state = 22;
 		break;
@@ -408,28 +472,67 @@ fill_at_count(&at_count,40);//延时2s
 {
 		if(strstr((const char*)UART5_RX_BUF, (const char*)"OK"))
 		{
-						prt=Seek_comma(UART5_RX_BUF,1);
-				for(++prt;*prt!=',';prt++)
-					{
-						gps.lat[i++]=*prt;
-					}
-					i=0;
-				prt=Seek_comma(UART5_RX_BUF,2);
-				for(++prt;*prt!=',';prt++)
-					{
-						gps.lon[i++]=*prt;
-					}
-					i=0;
-						gps.lat[9]='\0';
-						gps.lon[10]='\0';
-					
-						state = 0;//完成切换到0
+				state = 23;//如果匹配成功,切换到状态2
 		}
 		else
 		{
 			  state = 0;
 		}
 }
+		break;
+//配置输出到串口波特率
+	 case 23:
+		uart5_send_string("AT+CGNSIPR=115200\r\n");
+		fill_at_count(&at_count,40);//延时2s
+	  state = 24;
+		break;
+	 case 24: 
+		if(check_at_count(&at_count))
+{
+		if(strstr((const char*)UART5_RX_BUF, (const char*)"OK"))
+		{
+				state = 25;//如果匹配成功,切换到状态2
+		}
+		else
+		{
+			  state = 0;
+		}
+}
+		break;
+//获取
+	 case 25:
+//uart5_send_string("AT+CGNSINF\r\n");
+//fill_at_count(&at_count,40);//延时2s
+	  state = 26;
+		break;
+	 case 26: 
+//		if(check_at_count(&at_count))
+//{
+//		if(strstr((const char*)UART5_RX_BUF, (const char*)"CGNSINF"))
+//		{
+//						prt=Seek_comma(UART5_RX_BUF,1);
+//				for(++prt;*prt!=',';prt++)
+//					{
+//						gps.lat[i++]=*prt;
+//					}
+//					i=0;
+//				prt=Seek_comma(UART5_RX_BUF,2);
+//				for(++prt;*prt!=',';prt++)
+//					{
+//						gps.lon[i++]=*prt;
+//					}
+//					i=0;
+//						gps.lat[9]='\0';
+//						gps.lon[10]='\0';
+//					
+//						state = 0;//完成切换到0
+//		}
+//		else
+//		{
+//			  state = 0;
+//		}
+//}
+    state = 0; 
 		break;
 /////////////////////////////////////////////////出错处理//////////////////////////////
 //连接出错
@@ -640,7 +743,11 @@ volatile unsigned char* Seek_comma(volatile unsigned char *prt,unsigned char n)/
     {
    //出错
     }
-   if(!check_AT_ok("AT+CGPSINF=0\r\n","OK",1000))//
+			 if(check_AT_ok("AT+CGNSSEQ=\"RMC\"\r\n","OK",1000))//指示GPRS附着状态
+    {
+   //出错
+    }
+   if(!check_AT_ok("AT+CGPSINF=2\r\n","OK",1000))//
     { 
   prt=Seek_comma(UART5_RX_BUF,1);
     for(++prt;*prt!=',';prt++)

@@ -35,9 +35,9 @@ extern u8 USART3_TX_P;
 extern u8 USART3_TX_NUM;
 extern u8 USART3_BUSY;
 
-extern u8 UART4_RX_BUF[16];
+extern u8 UART4_RX_BUF[500];
 extern u8 UART4_RX_DEAL[16];
-extern u8 UART4_RX_P;
+extern u32 UART4_RX_P;
 extern u8 UART4_RXED;
 extern u8 UART4_TX_BUF[16];
 extern u8 UART4_TX_P;
@@ -69,6 +69,13 @@ void USART3_SendBytes(u8 *s,u8 len);
 void USART3_SendData(u8 dat);
 void UART4_SendBytes(u8 *s,u8 len);
 void UART5_SendBytes(u8 *s,u8 len);
+//修改如下
+//结构定义
+typedef struct _gps_original{
+u8 N[16];
+u8 E[16];	
+}gps_original;
+//END
 #endif
 
 
